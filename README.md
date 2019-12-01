@@ -53,7 +53,7 @@ OPTIONS
   -o, --output=output  Output generated file
 ```
 
-_See code: [src/commands/build.ts](https://github.com/fde31/max-js-bundler/blob/v1.2.0/src/commands/build.ts)_
+_See code: [src\commands\build.ts](https://github.com/fde31/max-js-bundler/blob/v1.2.0/src\commands\build.ts)_
 
 ## `max-js-bundler help [COMMAND]`
 
@@ -70,7 +70,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src\commands\help.ts)_
 <!-- commandsstop -->
 
 

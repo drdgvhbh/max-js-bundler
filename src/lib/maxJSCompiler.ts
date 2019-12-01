@@ -1,18 +1,23 @@
 import { basename, dirname, extname } from "path";
 
-import { rollup, RollupBuild, RollupOutput, OutputChunk, OutputAsset } from "rollup";
+import {
+	rollup,
+	RollupBuild,
+	RollupOutput,
+	OutputChunk,
+	OutputAsset
+} from "rollup";
 import nodeResolve from "rollup-plugin-node-resolve";
 import babelPlugin from "rollup-plugin-babel";
 import commonJSPlugin from "rollup-plugin-commonjs";
 import builtinsPlugin from "rollup-plugin-node-builtins";
 import globalsPlugin from "rollup-plugin-node-globals";
 import jsonPlugin from "rollup-plugin-json";
+import typescript from "rollup-plugin-typescript";
 
 import { isFile } from "./utils";
 
-
 export class MaxJSCompiler {
-
 	static banner: string = `
 /**
  * This file has been auto-generated in order to prepare external projects using NPM dependencies etc
@@ -26,12 +31,7 @@ export class MaxJSCompiler {
 	readonly filepath: string;
 	private bundler: RollupBuild | null = null;
 
-	constructor({
-		filepath
-	}: {
-		filepath: string;
-	}) {
-
+	constructor({ filepath }: { filepath: string }) {
 		this.filepath = filepath;
 	}
 
@@ -50,11 +50,16 @@ export class MaxJSCompiler {
 	async setup(): Promise<void> {
 		// only setup once
 		if (this.bundler) return;
-		if (!(await isFile(this.filepath))) throw new Error(`File ${this.filepath} does not exist or is not a file.`);
+		if (!(await isFile(this.filepath))) {
+			throw new Error(
+				`File ${this.filepath} does not exist or is not a file.`
+			);
+		}
 
 		this.bundler = await rollup({
 			input: this.filepath,
 			plugins: [
+				typescript(),
 				nodeResolve({
 					browser: true
 				}),
@@ -73,11 +78,11 @@ export class MaxJSCompiler {
 						[
 							"@babel/plugin-transform-runtime",
 							{
-								"absoluteRuntime": true,
-								"corejs": 2,
-								"helpers": true,
-								"regenerator": true,
-								"useESModules": true
+								absoluteRuntime: true,
+								corejs: 2,
+								helpers: true,
+								regenerator: true,
+								useESModules: true
 							}
 						]
 					],
@@ -85,7 +90,7 @@ export class MaxJSCompiler {
 						[
 							"@babel/preset-env",
 							{
-								"useBuiltIns": "usage"
+								useBuiltIns: "usage"
 							}
 						]
 					]
@@ -96,10 +101,11 @@ export class MaxJSCompiler {
 	}
 
 	async output(): Promise<string> {
-
 		if (!this.bundler) throw new Error("Compiler has not been setup yet.");
 
-		const { output }: { output: RollupOutput["output"] } = await this.bundler.generate({
+		const {
+			output
+		}: { output: RollupOutput["output"] } = await this.bundler.generate({
 			banner: MaxJSCompiler.banner,
 			compact: false,
 			format: "c74max",
@@ -108,7 +114,10 @@ export class MaxJSCompiler {
 
 		if (output.length === 0) throw new Error("No output chunk generated");
 
-		const outputChunk: OutputChunk | OutputAsset | undefined = output.shift();
+		const outputChunk:
+		| OutputChunk
+		| OutputAsset
+		| undefined = output.shift();
 		return outputChunk && outputChunk.code ? outputChunk.code : "";
 	}
 }
